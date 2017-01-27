@@ -1,0 +1,32 @@
+#include <IRremote.h>
+#include <NewTone.h>
+#define TONE_PIN 8 // Pin you have speaker/piezo connected to (be sure to include a 100 ohm resistor).
+
+int RECV_PIN = 11;
+boolean buzz;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+void setup() {
+  //pinMode(buzzer, OUTPUT);
+  Serial.begin(9600);
+  irrecv.enableIRIn();
+  
+}
+
+void loop() {
+  if (irrecv.decode(&results)) {
+    Serial.println(results.value, HEX);
+    //once receive code from power button, the state of LED is changed from HIGH to LOW or from LOW to HIGH.
+    if (results.value == 0xFD00FF) {
+      buzz = !buzz;
+      //reverse
+      if(buzz){
+        soundAlarm();
+      }
+      else{
+        noNewTone(TONE_PIN); // Turn off the tone.
+      }
+    }
+    irrecv.resume();
+  }
+}
