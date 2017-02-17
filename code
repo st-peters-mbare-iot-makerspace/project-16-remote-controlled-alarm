@@ -30,3 +30,13 @@ void loop() {
     irrecv.resume();
   }
 }
+
+void soundAlarm(){
+  for (unsigned long freq = 325; freq <= 750; freq += 10) {  
+    NewTone(TONE_PIN, freq); // Play the frequency (125 Hz to 15 kHz sweep in 10 Hz steps).
+    delay(10); // Wait 1 ms so you can hear it.
+  }
+  
+
+  delay(100); // Wait a second.
+}
