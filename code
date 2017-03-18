@@ -1,42 +1,46 @@
+
 #include <IRremote.h>
 #include <NewTone.h>
 #define TONE_PIN 8 // Pin you have speaker/piezo connected to (be sure to include a 100 ohm resistor).
 
 int RECV_PIN = 11;
+int led=10;
 boolean buzz;
 IRrecv irrecv(RECV_PIN);
 decode_results results;
 void setup() {
-  //pinMode(buzzer, OUTPUT);
   Serial.begin(9600);
   irrecv.enableIRIn();
-  
+  pinMode(led, OUTPUT);
+
 }
 
 void loop() {
+  //soundAlarm();
   if (irrecv.decode(&results)) {
     Serial.println(results.value, HEX);
-    //once receive code from power button, the state of LED is changed from HIGH to LOW or from LOW to HIGH.
     if (results.value == 0xFD00FF) {
       buzz = !buzz;
-      //reverse
-      if(buzz){
-        soundAlarm();
-      }
-      else{
-        noNewTone(TONE_PIN); // Turn off the tone.
-      }
+      Serial.println(results.value, HEX);
     }
     irrecv.resume();
   }
+  alarmAndBlink(buzz);
 }
 
-void soundAlarm(){
-  for (unsigned long freq = 325; freq <= 750; freq += 10) {  
-    NewTone(TONE_PIN, freq); // Play the frequency (125 Hz to 15 kHz sweep in 10 Hz steps).
-    delay(10); // Wait 1 ms so you can hear it.
-  }
-  
-
-  delay(100); // Wait a second.
+void alarmAndBlink(boolean buzz){
+  if(buzz){
+    for (unsigned long freq = 325; freq <= 750; freq += 10) {  
+      NewTone(TONE_PIN, freq); // Play the frequency (125 Hz to 15 kHz sweep in 10 Hz steps).
+      delay(10); // Wait 1 ms so you can hear it.
+      Serial.println(freq);
+    }
+    digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
+    delay(500);               // wait for a second
+    digitalWrite(led, LOW);    // turn the LED off by making the voltage LOW
+    delay(500);
+  } 
+  else{
+    noNewTone(TONE_PIN);
+  } 
 }
